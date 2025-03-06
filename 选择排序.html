@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>选择排序教学演示</title>
+    <title>选择排序练习</title>
     <style>
         body {
             display: flex;
@@ -207,6 +207,61 @@
             overflow-y: auto;
             display: none;
         }
+
+        .code-container {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #1e1e1e;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .code-title {
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .code-content {
+            font-family: 'Consolas', monospace;
+            color: #d4d4d4;
+            white-space: pre;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .code-line {
+            display: block;
+            position: relative;
+            padding: 0 10px;
+        }
+
+        .code-line.highlight {
+            background-color: rgba(86, 156, 214, 0.2);
+            border-left: 3px solid #569cd6;
+        }
+
+        .code-comment {
+            color: #6a9955;
+        }
+
+        .code-keyword {
+            color: #569cd6;
+        }
+
+        .code-function {
+            color: #dcdcaa;
+        }
+
+        .code-number {
+            color: #b5cea8;
+        }
+
+        .code-type {
+            color: #4ec9b0;
+        }
     </style>
 </head>
 
@@ -222,6 +277,33 @@
                 <li>将该元素视为已排序</li>
                 <li>重复以上步骤，直到所有元素都已排序</li>
             </ol>
+        </div>
+        
+        <div class="code-container">
+            <div class="code-title">C语言实现</div>
+            <div class="code-content" id="codeContent">
+<span class="code-line"><span class="code-comment">// 选择排序函数</span></span>
+<span class="code-line"><span class="code-type">void</span> <span class="code-function">selectionSort</span>(<span class="code-type">int</span> arr[], <span class="code-type">int</span> n) {</span>
+<span class="code-line">    <span class="code-type">int</span> i, j, min_idx;</span>
+<span class="code-line">    </span>
+<span class="code-line">    <span class="code-comment">// 遍历未排序的数组</span></span>
+<span class="code-line">    <span class="code-keyword">for</span> (i = <span class="code-number">0</span>; i < n-<span class="code-number">1</span>; i++) {</span>
+<span class="code-line">        <span class="code-comment">// 找到未排序部分中的最小元素</span></span>
+<span class="code-line">        min_idx = i;</span>
+<span class="code-line">        <span class="code-keyword">for</span> (j = i+<span class="code-number">1</span>; j < n; j++) {</span>
+<span class="code-line">            <span class="code-keyword">if</span> (arr[j] < arr[min_idx])</span>
+<span class="code-line">                min_idx = j;</span>
+<span class="code-line">        }</span>
+<span class="code-line">        </span>
+<span class="code-line">        <span class="code-comment">// 将找到的最小元素与未排序部分的第一个元素交换</span></span>
+<span class="code-line">        <span class="code-keyword">if</span> (min_idx != i) {</span>
+<span class="code-line">            <span class="code-type">int</span> temp = arr[i];</span>
+<span class="code-line">            arr[i] = arr[min_idx];</span>
+<span class="code-line">            arr[min_idx] = temp;</span>
+<span class="code-line">        }</span>
+<span class="code-line">    }</span>
+<span class="code-line">}</span>
+            </div>
         </div>
         
         <div class="score-container" id="scoreContainer" style="display: none;">
@@ -274,8 +356,8 @@
             
             <div class="buttons-container">
                 <button class="btn" id="restartButton">重新开始</button>
-            </div>
-        </div>
+    </div>
+    </div>
         
         <!-- 添加调试信息区域 -->
         <div id="debug"></div>
@@ -326,7 +408,7 @@
         const swapButton = document.getElementById('swapButton');
         const skipButton = document.getElementById('skipButton');
         const restartButton = document.getElementById('restartButton');
-        
+
         // 游戏状态变量
         let numbers = [];
         let sortedIndex = 0;          // 已排序部分的边界
@@ -344,6 +426,56 @@
         // 数组大小设置
         const MIN_ARRAY_SIZE = 5;
         const MAX_ARRAY_SIZE = 8;
+        
+        /**
+         * 更新代码高亮
+         * @param {string} phase - 当前阶段
+         * @param {number} lineStart - 开始行号
+         * @param {number} lineEnd - 结束行号
+         */
+        function updateCodeHighlight(phase) {
+            // 移除所有高亮
+            const codeLines = document.querySelectorAll('.code-line');
+            codeLines.forEach(line => line.classList.remove('highlight'));
+
+            // 根据不同阶段高亮相应代码行
+            switch (phase) {
+                case 'INIT':
+                    // 高亮函数声明
+                    highlightLines(1, 3);
+                    break;
+                case 'OUTER_LOOP':
+                    // 高亮外层循环
+                    highlightLines(6);
+                    break;
+                case 'FIND_MIN':
+                    // 高亮找最小值的初始化
+                    highlightLines(8);
+                    break;
+                case 'COMPARE':
+                    // 高亮比较和更新最小值的代码
+                    highlightLines(9, 12);
+                    break;
+                case 'SWAP_DECISION':
+                    // 高亮交换相关代码
+                    highlightLines(15, 19);
+                    break;
+            }
+        }
+
+        /**
+         * 高亮指定行范围的代码
+         * @param {number} start - 开始行号
+         * @param {number} end - 结束行号（可选）
+         */
+        function highlightLines(start, end = start) {
+            const codeLines = document.querySelectorAll('.code-line');
+            for (let i = start; i <= end; i++) {
+                if (codeLines[i]) {
+                    codeLines[i].classList.add('highlight');
+                }
+            }
+        }
         
         /**
          * 生成随机数组
@@ -445,6 +577,7 @@
          */
         function handleCompareDecision(isSmaller) {
             totalDecisions++;
+            updateCodeHighlight('COMPARE');
             
             // 计算正确答案
             const correctAnswer = sortOrder === 'asc' ? 
@@ -500,6 +633,7 @@
          */
         function handleSwapDecision(shouldSwap) {
             totalDecisions++;
+            updateCodeHighlight('SWAP_DECISION');
             
             // 计算正确答案 - 如果最小值不是未排序部分的第一个元素，则应该交换
             const correctAnswer = currentMinIndex !== sortedIndex;
@@ -553,6 +687,8 @@
             compareIndex = sortedIndex + 1;
             step = 'COMPARE';
             
+            updateCodeHighlight('FIND_MIN');
+            
             // 更新UI
             swapContainer.style.display = 'none';
             compareContainer.style.display = 'block';
@@ -574,7 +710,7 @@
             const isDescending = numbers.every((num, index, arr) => index === 0 || arr[index - 1] >= num);
             
             let resultMessage;
-            
+
             if (sortOrder === 'asc' && isAscending) {
                 resultMessage = `恭喜你！成功完成从小到大排序！\n最终得分: ${score}\n正确率: ${Math.round((correctDecisions / totalDecisions) * 100)}%`;
                 debug('从小到大排序成功');
@@ -585,11 +721,11 @@
                 resultMessage = `排序结果有误，请重新尝试！\n最终得分: ${score}\n正确率: ${Math.round((correctDecisions / totalDecisions) * 100)}%`;
                 debug('排序失败');
             }
-            
+
             alert(resultMessage);
             resetGame();
         }
-        
+
         /**
          * 重置游戏
          */
@@ -614,6 +750,38 @@
         }
         
         /**
+         * 更新代码内容
+         */
+        function updateCodeContent(order) {
+            const codeContent = document.getElementById('codeContent');
+            const isAsc = order === 'asc';
+            const compareOp = isAsc ? '<' : '>';
+            const extremeWord = isAsc ? '最小' : '最大';
+            
+            codeContent.innerHTML = `<span class="code-line"><span class="code-comment">// 选择排序函数 - ${isAsc ? '从小到大' : '从大到小'}</span></span>
+<span class="code-line"><span class="code-type">void</span> <span class="code-function">selectionSort</span>(<span class="code-type">int</span> arr[], <span class="code-type">int</span> n) {</span>
+<span class="code-line">    <span class="code-type">int</span> i, j, ${extremeWord}_idx;</span>
+<span class="code-line">    </span>
+<span class="code-line">    <span class="code-comment">// 遍历未排序的数组</span></span>
+<span class="code-line">    <span class="code-keyword">for</span> (i = <span class="code-number">0</span>; i < n-<span class="code-number">1</span>; i++) {</span>
+<span class="code-line">        <span class="code-comment">// 找到未排序部分中的${extremeWord}元素</span></span>
+<span class="code-line">        ${extremeWord}_idx = i;</span>
+<span class="code-line">        <span class="code-keyword">for</span> (j = i+<span class="code-number">1</span>; j < n; j++) {</span>
+<span class="code-line">            <span class="code-keyword">if</span> (arr[j] ${compareOp} arr[${extremeWord}_idx])</span>
+<span class="code-line">                ${extremeWord}_idx = j;</span>
+<span class="code-line">        }</span>
+<span class="code-line">        </span>
+<span class="code-line">        <span class="code-comment">// 将找到的${extremeWord}元素与未排序部分的第一个元素交换</span></span>
+<span class="code-line">        <span class="code-keyword">if</span> (${extremeWord}_idx != i) {</span>
+<span class="code-line">            <span class="code-type">int</span> temp = arr[i];</span>
+<span class="code-line">            arr[i] = arr[${extremeWord}_idx];</span>
+<span class="code-line">            arr[${extremeWord}_idx] = temp;</span>
+<span class="code-line">        }</span>
+<span class="code-line">    }</span>
+<span class="code-line">}</span>`;
+        }
+        
+        /**
          * 开始游戏
          */
         function startGame(order) {
@@ -625,7 +793,11 @@
             scoreContainer.style.display = 'flex';
             progressBar.style.display = 'block';
             
+            // 更新代码显示
+            updateCodeContent(order);
+            
             generateRandomArray();
+            updateCodeHighlight('INIT');
             
             sortedIndex = 0;
             currentMinIndex = 0;
