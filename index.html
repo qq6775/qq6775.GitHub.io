@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>冒泡排序演示（自由模式）</title>
+    <style>
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 5px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .bar {
+            width: 40px;
+            border: 2px solid transparent;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s;
+        }
+
+        .highlight {
+            position: relative;
+        }
+
+        .highlight::before {
+            content: "↑";
+            position: absolute;
+            top: -25px;
+            font-size: 24px;
+            color: #ff4757;
+            animation: pulse 1s infinite;
+        }
+
+        .highlight .bar {
+            border-color: #ff4757;
+            box-shadow: 0 0 10px rgba(255,71,71,0.3);
+        }
+
+        .number {
+            margin-top: 5px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        #chart {
+            display: flex;
+            align-items: flex-end;
+            height: 300px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .controls {
+            margin: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            margin: 0 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .order-selector label {
+            margin-right: 15px;
+            padding: 8px 12px;
+            background: #e9ecef;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="controls order-selector">
+        <label>
+            <input type="radio" name="sortOrder" value="asc" checked> 从小到大
+        </label>
+        <label>
+            <input type="radio" name="sortOrder" value="desc"> 从大到小
+        </label>
+    </div>
+    
+    <div id="chart"></div>
+    <div class="controls">
+        <button id="startBtn">开始排序</button>
+        <button id="swapBtn" disabled>交换</button>
+        <button id="noSwapBtn" disabled>跳过</button>
+    </div>
+
+    <script>
+        let arr = [];
+        let currentI = 0;
+        let currentJ = 0;
+        let originalArr = [];
+        let isCompleted = false;
+
+        // 生成颜色（基于HSL）
+        const colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', 
+            '#96CEB4', '#FFEEAD', '#FF9F43', 
+            '#ED4C67'
+        ];
+
+        function generateRandomArray() {
+            const arr = [];
+            while (arr.length < 7) {
+                const num = Math.floor(Math.random() * 9) + 1;
+                if (!arr.includes(num)) arr.push(num);
+            }
+            return arr;
+        }
+
+        function renderBars() {
+            const chart = document.getElementById('chart');
+            chart.innerHTML = '';
+            
+            arr.forEach((value, index) => {
+                const barContainer = document.createElement('div');
+                barContainer.className = `bar-container${
+                    (index === currentJ || index === currentJ + 1) ? ' highlight' : ''
+                }`;
+
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${value * 30}px`;
+                bar.style.backgroundColor = colors[index % colors.length];
+
+                const number = document.createElement('span');
+                number.className = 'number';
+                number.textContent = value;
+
+                barContainer.appendChild(bar);
+                barContainer.appendChild(number);
+                chart.appendChild(barContainer);
+            });
+        }
+
+        function checkSorted() {
+            const sortOrder = document.querySelector('input[name="sortOrder"]:checked').value;
+            for (let i = 0; i < arr.length - 1; i++) {
+                if (sortOrder === 'asc' && arr[i] > arr[i + 1]) return false;
+                if (sortOrder === 'desc' && arr[i] < arr[i + 1]) return false;
+            }
+            return true;
+        }
+
+        function handleOperation() {
+            currentJ++;
+            
+            if (currentJ >= arr.length - currentI - 1) {
+                currentI++;
+                currentJ = 0;
+                
+                if (currentI >= arr.length - 1) {
+                    isCompleted = true;
+                    const success = checkSorted();
+                    alert(success ? '排序成功！🎉' : '排序失败！❌');
+                    document.getElementById('startBtn').disabled = false;
+                    document.querySelectorAll('input[name="sortOrder"]').forEach(radio => {
+                        radio.disabled = false;
+                    });
+                    return;
+                }
+            }
+            renderBars();
+        }
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            arr = generateRandomArray();
+            originalArr = [...arr];
+            currentI = 0;
+            currentJ = 0;
+            isCompleted = false;
+            
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('swapBtn').disabled = false;
+            document.getElementById('noSwapBtn').disabled = false;
+            document.querySelectorAll('input[name="sortOrder"]').forEach(radio => {
+                radio.disabled = true;
+            });
+            
+            renderBars();
+        });
+
+        document.getElementById('swapBtn').addEventListener('click', () => {
+            if (isCompleted) return;
+            [arr[currentJ], arr[currentJ + 1]] = [arr[currentJ + 1], arr[currentJ]];
+            handleOperation();
+        });
+
+        document.getElementById('noSwapBtn').addEventListener('click', () => {
+            if (isCompleted) return;
+            handleOperation();
+        });
+
+        // 初始生成
+        arr = generateRandomArray();
+        originalArr = [...arr];
+        renderBars();
+    </script>
+</body>
+</html>
