@@ -358,46 +358,60 @@
             flippedCards.add(id);
             clickCount++;
 
-            // 最终验证函数
-            const finalCheck = () => {
-                if (flippedCards.size === 5) {
-                    gameCompleted = true;
-                    resetButton.style.display = 'block';
-                    
-                    let targetValue;
-                    if (searchMode === 'max') {
-                        targetValue = Math.max(...values);
-                    } else {
-                        targetValue = Math.min(...values);
-                    }
-                    
-                    const result = document.getElementById('result');
-                    const success = aCard.value === targetValue;
-                    
-                    result.textContent = success 
-                        ? `🎉 恭喜！A卡是${searchMode === 'max' ? '最大' : '最小'}值！` 
-                        : `❌ A卡不是${searchMode === 'max' ? '最大' : '最小'}值，请再试一次！`;
-                    result.style.color = success ? "green" : "red";
-                    
-                    if (success) {
-                        nextLink.style.display = 'block';
-                    }
-                }
-            };
-
             // 处理不同点击顺序
             if (clickCount === 1) {
-                updateSpecialCards(value, 1);
+                updateSpecialCards(value, id);
                 setTimeout(() => {
-                    alert("已自动记录首张卡片信息");
-                    finalCheck();
+                    alert(`已自动记录首张卡片信息 - 值: ${value}\n您正在${searchMode === 'max' ? '查找最大值' : '查找最小值'}`);
+                    checkCompletion();
                 }, 300);
             } else {
                 setTimeout(() => {
-                    const shouldUpdate = confirm(`当前值：${value}\n是否更新为新的比较基准？`);
+                    // 根据搜索模式提供不同的提示
+                    let shouldUpdate = false;
+                    
+                    if (searchMode === 'max') {
+                        shouldUpdate = value > aCard.value ? 
+                            confirm(`当前值: ${value} > A卡值: ${aCard.value}\n是否更新A卡为更大的值?`) : 
+                            confirm(`当前值: ${value} <= A卡值: ${aCard.value}\n这个值不是更大的，确定要更新A卡吗?`);
+                    } else { // min mode
+                        shouldUpdate = value < aCard.value ? 
+                            confirm(`当前值: ${value} < A卡值: ${aCard.value}\n是否更新A卡为更小的值?`) : 
+                            confirm(`当前值: ${value} >= A卡值: ${aCard.value}\n这个值不是更小的，确定要更新A卡吗?`);
+                    }
+                    
                     if (shouldUpdate) updateSpecialCards(value, id);
-                    finalCheck();
+                    checkCompletion();
                 }, 300);
+            }
+        };
+
+        // 检查游戏是否完成
+        const checkCompletion = () => {
+            if (flippedCards.size === 5) {
+                gameCompleted = true;
+                resetButton.style.display = 'block';
+                
+                let targetValue;
+                if (searchMode === 'max') {
+                    targetValue = Math.max(...values);
+                    console.log(`最大值为: ${targetValue}`);
+                } else {
+                    targetValue = Math.min(...values);
+                    console.log(`最小值为: ${targetValue}`);
+                }
+                
+                const result = document.getElementById('result');
+                const success = aCard.value === targetValue;
+                
+                result.textContent = success 
+                    ? `🎉 恭喜！A卡是${searchMode === 'max' ? '最大' : '最小'}值 (${targetValue})！` 
+                    : `❌ A卡 (${aCard.value}) 不是${searchMode === 'max' ? '最大' : '最小'}值 (${targetValue})，请再试一次！`;
+                result.style.color = success ? "green" : "red";
+                
+                if (success) {
+                    nextLink.style.display = 'block';
+                }
             }
         };
 
@@ -418,6 +432,8 @@
             // 更新背面显示
             document.getElementById('a-value').textContent = value;
             document.getElementById('b-value').textContent = id;
+            
+            console.log(`已更新A卡为值: ${value}, 编号: ${id}, 当前模式: ${searchMode}`);
         };
         
         // 重置游戏
