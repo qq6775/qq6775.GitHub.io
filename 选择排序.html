@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -14,81 +14,34 @@
             min-height: 100vh;
             margin: 0;
             background-color: #f4f4f9;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            padding: 10px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        h1 {
-            color: #2c3e50;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .cube-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 10px 0;
-            max-width: 100%;
         }
 
        .cube {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             background-color: #6495ED;
             display: inline-block;
-            margin: 8px;
+            margin: 10px;
             position: relative;
             transform-style: preserve-3d;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             border-radius: 8px;
         }
 
-        @media (max-width: 480px) {
-            .cube {
-                width: 50px;
-                height: 50px;
-                margin: 5px;
-            }
-        }
-
        .number-card {
-            width: 50px;
-            height: 28px;
+            width: 60px;
+            height: 30px;
             background-color: #FFA500;
             position: absolute;
-            top: -32px;
+            top: -35px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
-            line-height: 28px;
-            font-size: 16px;
+            line-height: 30px;
+            font-size: 18px;
             border-radius: 5px;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        @media (max-width: 480px) {
-            .number-card {
-                width: 40px;
-                height: 24px;
-                top: -28px;
-                line-height: 24px;
-                font-size: 14px;
-            }
         }
 
        .arrow {
@@ -98,128 +51,58 @@
             border-right: 10px solid transparent;
             border-bottom: 10px solid red;
             position: absolute;
-            bottom: -15px;
+            bottom: -20px;
             left: 50%;
             transform: translateX(-50%);
             display: none;
         }
 
-        .button-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-            width: 100%;
-        }
-
         button {
-            padding: 12px 20px;
+            padding: 12px 24px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin: 0 10px;
             color: white;
             font-weight: bold;
-            min-width: 100px;
-        }
-
-        .start-btn {
             background-color: #007BFF;
         }
 
-        .start-btn:hover {
+        button:hover {
             background-color: #0056b3;
         }
 
-        .game-btn {
-            margin: 0 5px;
+       .start-buttons {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
-        #swapButton {
-            background-color: #28a745;
-        }
-
-        #swapButton:hover {
-            background-color: #218838;
-        }
-
-        #skipButton {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        #skipButton:hover {
-            background-color: #e0a800;
-        }
-
-        #restartButton {
-            background-color: #dc3545;
-        }
-
-        #restartButton:hover {
-            background-color: #c82333;
-        }
-
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        .back-link {
+       .game-buttons {
+            display: flex;
+            justify-content: center;
             margin-top: 20px;
-            color: #007BFF;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        
-        .next-link {
-            margin-top: 10px;
-            color: #28a745;
-            text-decoration: none;
-            font-weight: bold;
-            display: none;
-        }
-        
-        .next-link:hover {
-            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
-    <div class="header">
-        <h1>选择排序互动游戏</h1>
-        <p class="description">在选择排序中，每一轮需要从剩余未排序的元素中找出最小/最大的元素，与当前位置交换。</p>
+    <div class="start-buttons" id="startButtons">
+        <button id="ascButton">从小到大</button>
+        <button id="descButton">从大到小</button>
     </div>
-    
-    <div class="button-container" id="startButtons">
-        <button id="ascButton" class="start-btn">从小到大</button>
-        <button id="descButton" class="start-btn">从大到小</button>
-    </div>
-    
-    <div id="boxes" class="cube-container" style="display: none;">
+    <div id="boxes" style="display: none;">
         <!-- 这里会动态生成 5 个箱子 -->
     </div>
-    
-    <div class="button-container game-buttons">
-        <button id="swapButton" class="game-btn" disabled style="display: none;">交换</button>
-        <button id="skipButton" class="game-btn" style="display: none;">不交换</button>
-        <button id="restartButton" class="game-btn" style="display: none;">重新开始</button>
+    <div class="game-buttons">
+        <button id="swapButton" disabled style="display: none;">交换</button>
+        <button id="skipButton" style="display: none;">不交换</button>
+        <button id="restartButton" style="display: none;">重新开始</button>
     </div>
-    
-    <div id="status" style="margin: 10px 0; color: #333; font-weight: bold;"></div>
-    
-    <a href="index.html" class="back-link">返回主页</a>
-    <a href="冒泡排序.html" class="next-link" id="nextLink">进入冒泡排序游戏 →</a>
 
     <script>
-        // DOM 元素
         const boxes = document.getElementById('boxes');
         const swapButton = document.getElementById('swapButton');
         const skipButton = document.getElementById('skipButton');
@@ -227,18 +110,13 @@
         const startButtons = document.getElementById('startButtons');
         const ascButton = document.getElementById('ascButton');
         const descButton = document.getElementById('descButton');
-        const statusDisplay = document.getElementById('status');
 
-        // 游戏状态变量
         let numbers = [];
         let currentIndex = 0;
         let selectedCard = null;
-        let sortOrder = '';
-        let gameActive = false;
+        let sortOrder;
 
-        /**
-         * 生成5个随机且互不相同的0至200的整数
-         */
+        // 生成 5 个随机且互不相同的 0 至 200 的整数
         function generateRandomNumbers() {
             numbers = [];
             while (numbers.length < 5) {
@@ -247,269 +125,131 @@
                     numbers.push(num);
                 }
             }
-            console.log('生成的随机数组:', numbers);
         }
 
-        /**
-         * 渲染箱子和卡片
-         */
+        // 渲染箱子
         function renderBoxes() {
             boxes.innerHTML = '';
-            
-            for (let i = 0; i < numbers.length; i++) {
-                const num = numbers[i];
-                
+            numbers.forEach((num, index) => {
                 const cube = document.createElement('div');
                 cube.classList.add('cube');
-                cube.id = `cube-${i}`;
 
                 const numberCard = document.createElement('div');
                 numberCard.classList.add('number-card');
                 numberCard.textContent = num;
-                numberCard.id = `card-${i}`;
-                
-                // 使用闭包保存索引值
-                numberCard.onclick = (function(index) {
-                    return function() {
-                        handleCardClick(index);
-                    };
-                })(i);
-                
+                numberCard.dataset.index = index;
+                numberCard.addEventListener('click', () => selectCard(numberCard));
                 cube.appendChild(numberCard);
 
                 const arrow = document.createElement('div');
                 arrow.classList.add('arrow');
-                arrow.id = `arrow-${i}`;
                 cube.appendChild(arrow);
 
                 boxes.appendChild(cube);
-            }
-            
-            updateUI();
+            });
+            showArrow(currentIndex);
         }
 
-        /**
-         * 处理卡片点击事件
-         */
-        function handleCardClick(index) {
-            console.log(`点击卡片 #${index}, 值=${numbers[index]}`);
-            
-            if (!gameActive) {
-                console.log('游戏未激活，不响应点击');
-                return;
-            }
-            
-            if (index === currentIndex) {
-                console.log('不能选择当前位置的卡片');
-                return;
-            }
-            
-            selectedCard = index;
-            console.log('已选择卡片:', selectedCard);
-            
-            updateUI();
+        // 显示箭头
+        function showArrow(index) {
+            const allArrows = document.querySelectorAll('.arrow');
+            allArrows.forEach((arrow, i) => {
+                arrow.style.display = i === index ? 'block' : 'none';
+            });
         }
 
-        /**
-         * 更新游戏UI状态
-         */
-        function updateUI() {
-            console.log('更新UI, 游戏状态:', gameActive, '当前索引:', currentIndex, '选中卡片:', selectedCard);
-            
-            // 更新箭头显示
-            for (let i = 0; i < numbers.length; i++) {
-                const arrow = document.getElementById(`arrow-${i}`);
-                if (arrow) {
-                    arrow.style.display = i === currentIndex ? 'block' : 'none';
-                }
+        // 选择要交换的卡片
+        function selectCard(card) {
+            if (selectedCard) {
+                selectedCard.style.backgroundColor = '#FFA500';
             }
-            
-            // 重置所有卡片样式
-            for (let i = 0; i < numbers.length; i++) {
-                const card = document.getElementById(`card-${i}`);
-                if (card) {
-                    card.style.backgroundColor = '#FFA500';
-                }
-            }
-            
-            // 高亮选中的卡片
-            if (selectedCard !== null) {
-                const card = document.getElementById(`card-${selectedCard}`);
-                if (card) {
-                    card.style.backgroundColor = 'lightgreen';
-                }
-            }
-            
-            // 更新游戏按钮状态
-            if (gameActive) {
-                swapButton.style.display = 'inline-block';
-                skipButton.style.display = 'inline-block';
-                restartButton.style.display = 'inline-block';
-                
-                // 只有在选择了卡片的情况下才启用交换按钮
-                if (selectedCard !== null) {
-                    swapButton.disabled = false;
-                    console.log('交换按钮已启用');
-                } else {
-                    swapButton.disabled = true;
-                    console.log('交换按钮已禁用');
-                }
-            } else {
-                swapButton.style.display = 'none';
-                skipButton.style.display = 'none';
-                restartButton.style.display = 'none';
-            }
-            
-            // 更新状态显示
-            if (gameActive) {
-                statusDisplay.textContent = `当前位置: ${currentIndex + 1}, 排序方式: ${sortOrder === 'asc' ? '从小到大' : '从大到小'}`;
-            } else {
-                statusDisplay.textContent = '';
-            }
+            selectedCard = card;
+            selectedCard.style.backgroundColor = 'lightgreen';
+            swapButton.disabled = false;
         }
 
-        /**
-         * 执行交换操作
-         */
+        // 交换数字
         function swapNumbers() {
-            if (!gameActive || selectedCard === null) {
-                console.log('无法执行交换操作');
-                return;
-            }
-            
-            console.log(`交换: 位置 ${currentIndex} (${numbers[currentIndex]}) 和位置 ${selectedCard} (${numbers[selectedCard]})`);
-            
-            // 交换数组元素
-            const temp = numbers[currentIndex];
-            numbers[currentIndex] = numbers[selectedCard];
-            numbers[selectedCard] = temp;
-            
-            // 重置选择状态
-            selectedCard = null;
-            
-            // 移动到下一个索引
-            currentIndex++;
-            
-            // 检查是否需要结束游戏
-            if (currentIndex >= numbers.length - 1) {
-                checkSorting();
-            } else {
+            if (selectedCard) {
+                const selectedIndex = parseInt(selectedCard.dataset.index);
+                [numbers[currentIndex], numbers[selectedIndex]] = [numbers[selectedIndex], numbers[currentIndex]];
                 renderBoxes();
+                selectedCard = null;
+                swapButton.disabled = true;
+                currentIndex++;
+                if (currentIndex < numbers.length - 1) {
+                    showArrow(currentIndex);
+                } else {
+                    checkSorting();
+                }
             }
         }
 
-        /**
-         * 跳过当前操作，不交换
-         */
+        // 跳过当前箱子
         function skipBox() {
-            console.log(`跳过位置 ${currentIndex}`);
-            
-            // 重置选择状态
-            selectedCard = null;
-            
-            // 移动到下一个索引
             currentIndex++;
-            
-            // 检查是否需要结束游戏
-            if (currentIndex >= numbers.length - 1) {
-                checkSorting();
+            if (currentIndex < numbers.length - 1) {
+                showArrow(currentIndex);
+                selectedCard = null;
+                swapButton.disabled = true;
             } else {
-                updateUI();
+                checkSorting();
             }
         }
 
-        /**
-         * 检查排序结果
-         */
+        // 检查排序结果
         function checkSorting() {
-            console.log('检查排序结果:', numbers);
-            
             const isAscending = numbers.every((num, index, arr) => index === 0 || arr[index - 1] <= num);
             const isDescending = numbers.every((num, index, arr) => index === 0 || arr[index - 1] >= num);
-            
             let resultMessage;
-            let success = false;
 
             if (sortOrder === 'asc' && isAscending) {
-                resultMessage = '恭喜你完成从小到大排序！🎉';
-                success = true;
+                resultMessage = '恭喜你完成从小到大排序';
             } else if (sortOrder === 'desc' && isDescending) {
-                resultMessage = '恭喜你完成从大到小排序！🎉';
-                success = true;
+                resultMessage = '恭喜你完成从大到小排序';
             } else {
-                resultMessage = '排序失败，请再试一次！❌';
+                resultMessage = '排序失败';
             }
-            
-            gameActive = false;
+
             alert(resultMessage);
-            
-            if (success) {
-                document.getElementById('nextLink').style.display = 'block';
-            }
-            
+            // 重置游戏状态并回到选择模式
             resetGame();
         }
 
-        /**
-         * 重置游戏状态
-         */
+        // 重置游戏状态
         function resetGame() {
             currentIndex = 0;
             selectedCard = null;
-            gameActive = false;
-            
             startButtons.style.display = 'flex';
             boxes.style.display = 'none';
             swapButton.style.display = 'none';
             skipButton.style.display = 'none';
             restartButton.style.display = 'none';
-            
-            statusDisplay.textContent = '';
         }
 
-        /**
-         * 开始游戏
-         */
+        // 重新开始游戏
+        function restartGame() {
+            resetGame();
+        }
+
+        // 开始游戏
         function startGame(order) {
-            console.log(`开始游戏, 排序顺序: ${order}`);
-            
             sortOrder = order;
-            currentIndex = 0;
-            selectedCard = null;
-            gameActive = true;
-            
             startButtons.style.display = 'none';
-            boxes.style.display = 'flex';
+            boxes.style.display = 'block';
             swapButton.style.display = 'inline-block';
-            swapButton.disabled = true; // 初始时禁用交换按钮
             skipButton.style.display = 'inline-block';
             restartButton.style.display = 'inline-block';
-            
             generateRandomNumbers();
             renderBoxes();
+            swapButton.disabled = true;
         }
 
-        // 初始化事件监听
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM完全加载，初始化事件监听器');
-            
-            // 绑定开始按钮事件
-            ascButton.addEventListener('click', function() {
-                startGame('asc');
-            });
-            
-            descButton.addEventListener('click', function() {
-                startGame('desc');
-            });
-            
-            // 绑定游戏按钮事件
-            swapButton.addEventListener('click', swapNumbers);
-            skipButton.addEventListener('click', skipBox);
-            restartButton.addEventListener('click', resetGame);
-            
-            // 初始化游戏状态
-            resetGame();
-        });
+        ascButton.addEventListener('click', () => startGame('asc'));
+        descButton.addEventListener('click', () => startGame('desc'));
+        swapButton.addEventListener('click', swapNumbers);
+        skipButton.addEventListener('click', skipBox);
+        restartButton.addEventListener('click', restartGame);
     </script>
 </body>
 
