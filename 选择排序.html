@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>选择排序互动游戏</title>
+    <title>选择排序教学演示</title>
     <style>
         body {
             display: flex;
@@ -14,242 +14,682 @@
             min-height: 100vh;
             margin: 0;
             background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
         }
 
-       .cube {
-            width: 80px;
-            height: 80px;
-            background-color: #6495ED;
-            display: inline-block;
-            margin: 10px;
-            position: relative;
-            transform-style: preserve-3d;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
+        h1 {
+            margin-bottom: 10px;
+            color: #333;
         }
 
-       .number-card {
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .array-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .element {
             width: 60px;
-            height: 30px;
-            background-color: #FFA500;
-            position: absolute;
-            top: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            line-height: 30px;
+            height: 60px;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 18px;
+            font-weight: bold;
             border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #6495ED;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-       .arrow {
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-bottom: 10px solid red;
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
+        .element.sorted {
+            background-color: #4CAF50;
         }
 
-        button {
+        .element.current {
+            background-color: #ff9999;
+            border: 2px solid red;
+        }
+
+        .element.min-value {
+            background-color: #FFEB3B;
+            color: #333;
+            border: 2px solid orange;
+        }
+
+        .element.comparing {
+            background-color: #E91E63;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .btn {
             padding: 12px 24px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
             margin: 0 10px;
             color: white;
             font-weight: bold;
             background-color: #007BFF;
+            user-select: none;
         }
 
-        button:hover {
+        .btn:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
         }
 
-       .start-buttons {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+        .btn-disabled {
+            background-color: #cccccc !important;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none !important;
         }
 
-       .game-buttons {
+        .btn-yes {
+            background-color: #4CAF50;
+        }
+
+        .btn-no {
+            background-color: #f44336;
+        }
+
+        .btn-swap {
+            background-color: #9C27B0;
+        }
+
+        .btn-skip {
+            background-color: #FF9800;
+        }
+
+        .step-container {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .buttons-container {
             display: flex;
             justify-content: center;
+            gap: 10px;
+        }
+
+        .algorithm-steps {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f1f8e9;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .algorithm-steps ol {
+            margin-left: 20px;
+        }
+
+        .algorithm-steps li {
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #757575;
+        }
+
+        #debug {
             margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            width: 100%;
+            font-family: monospace;
+            white-space: pre-line;
+            height: 150px;
+            overflow-y: auto;
+            display: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="start-buttons" id="startButtons">
-        <button id="ascButton">从小到大</button>
-        <button id="descButton">从大到小</button>
-    </div>
-    <div id="boxes" style="display: none;">
-        <!-- 这里会动态生成 5 个箱子 -->
-    </div>
-    <div class="game-buttons">
-        <button id="swapButton" disabled style="display: none;">交换</button>
-        <button id="skipButton" style="display: none;">不交换</button>
-        <button id="restartButton" style="display: none;">重新开始</button>
+    <div class="container">
+        <h1>选择排序教学演示</h1>
+        
+        <div class="algorithm-steps">
+            <h3>选择排序算法步骤：</h3>
+            <ol>
+                <li>从未排序的元素中找出最小(或最大)的元素</li>
+                <li>将它与未排序部分的第一个元素交换位置</li>
+                <li>将该元素视为已排序</li>
+                <li>重复以上步骤，直到所有元素都已排序</li>
+            </ol>
+        </div>
+        
+        <div class="score-container" id="scoreContainer" style="display: none;">
+            <div class="score-item">
+                <div class="score-value" id="scoreValue">0</div>
+                <div class="score-label">得分</div>
+            </div>
+            <div class="score-item">
+                <div class="score-value" id="correctPercentage">0%</div>
+                <div class="score-label">正确率</div>
+            </div>
+            <div class="score-item">
+                <div class="score-value" id="roundInfo">0/0</div>
+                <div class="score-label">轮次</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress" id="progress" style="width: 0%"></div>
+        </div>
+        
+        <div id="startScreen">
+            <div class="step-container">
+                <div class="question">选择排序顺序:</div>
+                <div class="buttons-container">
+                    <button class="btn" id="ascButton">从小到大排序</button>
+                    <button class="btn" id="descButton">从大到小排序</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="gameScreen" style="display: none;">
+            <div class="array-container" id="arrayContainer"></div>
+            
+            <div class="step-container" id="compareContainer" style="display: none;">
+                <div class="question" id="compareQuestion">元素 [?] 是否比当前最小值 [?] 更小?</div>
+                <div class="buttons-container">
+                    <button class="btn btn-yes" id="yesButton">是</button>
+                    <button class="btn btn-no" id="noButton">否</button>
+                </div>
+            </div>
+            
+            <div class="step-container" id="swapContainer" style="display: none;">
+                <div class="question" id="swapQuestion">是否需要将找到的最小值与未排序区域的第一个元素交换?</div>
+                <div class="buttons-container">
+                    <button class="btn btn-swap" id="swapButton">交换</button>
+                    <button class="btn btn-skip" id="skipButton">不交换</button>
+                </div>
+            </div>
+            
+            <div class="buttons-container">
+                <button class="btn" id="restartButton">重新开始</button>
+            </div>
+        </div>
+        
+        <!-- 添加调试信息区域 -->
+        <div id="debug"></div>
     </div>
 
     <script>
-        const boxes = document.getElementById('boxes');
+        // 调试工具函数
+        const DEBUG = false;
+        const debugElement = document.getElementById('debug');
+        
+        if (DEBUG) {
+            debugElement.style.display = 'block';
+        }
+        
+        function debug(message) {
+            if (DEBUG) {
+                console.log(message);
+                const time = new Date().toLocaleTimeString();
+                debugElement.innerHTML += `[${time}] ${message}<br>`;
+                debugElement.scrollTop = debugElement.scrollHeight;
+                
+                if (debugElement.innerHTML.length > 10000) {
+                    debugElement.innerHTML = debugElement.innerHTML.substring(debugElement.innerHTML.length - 8000);
+                }
+            }
+        }
+        
+        // DOM元素引用
+        const startScreen = document.getElementById('startScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const arrayContainer = document.getElementById('arrayContainer');
+        const compareContainer = document.getElementById('compareContainer');
+        const compareQuestion = document.getElementById('compareQuestion');
+        const swapContainer = document.getElementById('swapContainer');
+        const swapQuestion = document.getElementById('swapQuestion');
+        const scoreContainer = document.getElementById('scoreContainer');
+        const scoreValue = document.getElementById('scoreValue');
+        const correctPercentage = document.getElementById('correctPercentage');
+        const roundInfo = document.getElementById('roundInfo');
+        const progressBar = document.getElementById('progressBar');
+        const progress = document.getElementById('progress');
+        
+        // 按钮
+        const ascButton = document.getElementById('ascButton');
+        const descButton = document.getElementById('descButton');
+        const yesButton = document.getElementById('yesButton');
+        const noButton = document.getElementById('noButton');
         const swapButton = document.getElementById('swapButton');
         const skipButton = document.getElementById('skipButton');
         const restartButton = document.getElementById('restartButton');
-        const startButtons = document.getElementById('startButtons');
-        const ascButton = document.getElementById('ascButton');
-        const descButton = document.getElementById('descButton');
-
+        
+        // 游戏状态变量
         let numbers = [];
-        let currentIndex = 0;
-        let selectedCard = null;
-        let sortOrder;
-
-        // 生成 5 个随机且互不相同的 0 至 200 的整数
-        function generateRandomNumbers() {
+        let sortedIndex = 0;          // 已排序部分的边界
+        let currentMinIndex = 0;      // 当前暂定最小值的索引
+        let compareIndex = 0;         // 当前正在比较的元素索引
+        let sortOrder = '';           // 'asc' 或 'desc'
+        let step = 'FIND_MIN';        // 当前步骤: 'FIND_MIN', 'COMPARE', 'SWAP_DECISION'
+        
+        // 得分系统
+        let score = 0;                // 当前得分
+        let totalDecisions = 0;       // 总决策次数
+        let correctDecisions = 0;     // 正确决策次数
+        let currentRound = 0;         // 当前轮次
+        
+        // 数组大小设置
+        const MIN_ARRAY_SIZE = 5;
+        const MAX_ARRAY_SIZE = 8;
+        
+        /**
+         * 生成随机数组
+         */
+        function generateRandomArray() {
+            const size = Math.floor(Math.random() * (MAX_ARRAY_SIZE - MIN_ARRAY_SIZE + 1)) + MIN_ARRAY_SIZE;
             numbers = [];
-            while (numbers.length < 5) {
+            while (numbers.length < size) {
                 const num = Math.floor(Math.random() * 201);
                 if (!numbers.includes(num)) {
                     numbers.push(num);
                 }
             }
+            debug(`生成的随机数组: ${numbers.join(', ')}`);
         }
-
-        // 渲染箱子
-        function renderBoxes() {
-            boxes.innerHTML = '';
-            numbers.forEach((num, index) => {
-                const cube = document.createElement('div');
-                cube.classList.add('cube');
-
-                const numberCard = document.createElement('div');
-                numberCard.classList.add('number-card');
-                numberCard.textContent = num;
-                numberCard.dataset.index = index;
-                numberCard.addEventListener('click', () => selectCard(numberCard));
-                cube.appendChild(numberCard);
-
-                const arrow = document.createElement('div');
-                arrow.classList.add('arrow');
-                cube.appendChild(arrow);
-
-                boxes.appendChild(cube);
-            });
-            showArrow(currentIndex);
-        }
-
-        // 显示箭头
-        function showArrow(index) {
-            const allArrows = document.querySelectorAll('.arrow');
-            allArrows.forEach((arrow, i) => {
-                arrow.style.display = i === index ? 'block' : 'none';
-            });
-        }
-
-        // 选择要交换的卡片
-        function selectCard(card) {
-            if (selectedCard) {
-                selectedCard.style.backgroundColor = '#FFA500';
-            }
-            selectedCard = card;
-            selectedCard.style.backgroundColor = 'lightgreen';
-            swapButton.disabled = false;
-        }
-
-        // 交换数字
-        function swapNumbers() {
-            if (selectedCard) {
-                const selectedIndex = parseInt(selectedCard.dataset.index);
-                [numbers[currentIndex], numbers[selectedIndex]] = [numbers[selectedIndex], numbers[currentIndex]];
-                renderBoxes();
-                selectedCard = null;
-                swapButton.disabled = true;
-                currentIndex++;
-                if (currentIndex < numbers.length - 1) {
-                    showArrow(currentIndex);
+        
+        /**
+         * 找出当前未排序部分的最值索引
+         */
+        function findMinOrMaxIndex(startIdx, endIdx, isAscending) {
+            let targetIdx = startIdx;
+            for (let i = startIdx + 1; i <= endIdx; i++) {
+                if (isAscending) {
+                    // 找最小值
+                    if (numbers[i] < numbers[targetIdx]) {
+                        targetIdx = i;
+                    }
                 } else {
-                    checkSorting();
+                    // 找最大值
+                    if (numbers[i] > numbers[targetIdx]) {
+                        targetIdx = i;
+                    }
                 }
             }
+            return targetIdx;
         }
-
-        // 跳过当前箱子
-        function skipBox() {
-            currentIndex++;
-            if (currentIndex < numbers.length - 1) {
-                showArrow(currentIndex);
-                selectedCard = null;
-                swapButton.disabled = true;
+        
+        /**
+         * 更新数组显示
+         */
+        function renderArray() {
+            arrayContainer.innerHTML = '';
+            
+            numbers.forEach((num, index) => {
+                const element = document.createElement('div');
+                element.classList.add('element');
+                element.textContent = num;
+                element.dataset.index = index;
+                
+                // 已排序的元素
+                if (index < sortedIndex) {
+                    element.classList.add('sorted');
+                }
+                
+                // 当前未排序部分的第一个元素
+                if (index === sortedIndex) {
+                    element.classList.add('current');
+                }
+                
+                // 当前暂定最小值
+                if (index === currentMinIndex && step !== 'SWAP_DECISION') {
+                    element.classList.add('min-value');
+                }
+                
+                // 正在比较的元素
+                if (index === compareIndex && step === 'COMPARE') {
+                    element.classList.add('comparing');
+                }
+                
+                arrayContainer.appendChild(element);
+            });
+        }
+        
+        /**
+         * 更新进度条
+         */
+        function updateProgress() {
+            const totalRounds = numbers.length - 1;
+            const progress = (currentRound / totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+            roundInfo.textContent = `${currentRound}/${totalRounds}`;
+        }
+        
+        /**
+         * 更新分数显示
+         */
+        function updateScore() {
+            scoreValue.textContent = score;
+            if (totalDecisions > 0) {
+                const percentage = Math.round((correctDecisions / totalDecisions) * 100);
+                correctPercentage.textContent = `${percentage}%`;
             } else {
-                checkSorting();
+                correctPercentage.textContent = '0%';
             }
         }
-
-        // 检查排序结果
-        function checkSorting() {
+        
+        /**
+         * 处理比较决策
+         */
+        function handleCompareDecision(isSmaller) {
+            totalDecisions++;
+            
+            // 计算正确答案
+            const correctAnswer = sortOrder === 'asc' ? 
+                numbers[compareIndex] < numbers[currentMinIndex] : 
+                numbers[compareIndex] > numbers[currentMinIndex];
+            
+            if (isSmaller === correctAnswer) {
+                // 正确决策
+                score += 10;
+                correctDecisions++;
+                
+                if (correctAnswer) {
+                    // 更新当前最小值
+                    currentMinIndex = compareIndex;
+                }
+            } else {
+                // 错误决策
+                score = Math.max(0, score - 5);
+                alert('决策错误! ' + (sortOrder === 'asc' ? 
+                    `${numbers[compareIndex]} ${isSmaller ? '不小于' : '小于'} ${numbers[currentMinIndex]}` : 
+                    `${numbers[compareIndex]} ${isSmaller ? '不大于' : '大于'} ${numbers[currentMinIndex]}`));
+            }
+            
+            updateScore();
+            
+            // 移动到下一个比较元素
+            compareIndex++;
+            
+            if (compareIndex >= numbers.length) {
+                // 所有元素都已比较，进入交换决策阶段
+                step = 'SWAP_DECISION';
+                compareContainer.style.display = 'none';
+                swapContainer.style.display = 'block';
+                
+                if (sortOrder === 'asc') {
+                    swapQuestion.textContent = `是否需要将找到的最小值 ${numbers[currentMinIndex]} 与未排序区域的第一个元素 ${numbers[sortedIndex]} 交换?`;
+                } else {
+                    swapQuestion.textContent = `是否需要将找到的最大值 ${numbers[currentMinIndex]} 与未排序区域的第一个元素 ${numbers[sortedIndex]} 交换?`;
+                }
+            } else {
+                // 继续比较下一个元素
+                if (sortOrder === 'asc') {
+                    compareQuestion.textContent = `元素 ${numbers[compareIndex]} 是否比当前最小值 ${numbers[currentMinIndex]} 更小?`;
+                } else {
+                    compareQuestion.textContent = `元素 ${numbers[compareIndex]} 是否比当前最大值 ${numbers[currentMinIndex]} 更大?`;
+                }
+                renderArray();
+            }
+        }
+        
+        /**
+         * 处理交换决策
+         */
+        function handleSwapDecision(shouldSwap) {
+            totalDecisions++;
+            
+            // 计算正确答案 - 如果最小值不是未排序部分的第一个元素，则应该交换
+            const correctAnswer = currentMinIndex !== sortedIndex;
+            
+            if (shouldSwap === correctAnswer) {
+                // 正确决策
+                score += 20;
+                correctDecisions++;
+            } else {
+                // 错误决策
+                score = Math.max(0, score - 10);
+                alert('决策错误! ' + (correctAnswer ? 
+                    '应该进行交换' : 
+                    '不需要进行交换，最小值已经在正确位置'));
+            }
+            
+            updateScore();
+            
+            // 执行交换（如果需要）
+            if (shouldSwap) {
+                const temp = numbers[sortedIndex];
+                numbers[sortedIndex] = numbers[currentMinIndex];
+                numbers[currentMinIndex] = temp;
+            }
+            
+            // 更新已排序边界
+            sortedIndex++;
+            currentRound++;
+            updateProgress();
+            
+            // 检查是否完成排序
+            if (sortedIndex >= numbers.length - 1) {
+                // 排序完成
+                sortedIndex = numbers.length;
+                renderArray();
+                setTimeout(() => {
+                    checkSortingResult();
+                }, 500);
+            } else {
+                // 开始新一轮排序
+                startNewRound();
+            }
+        }
+        
+        /**
+         * 开始新一轮排序
+         */
+        function startNewRound() {
+            // 重置当前轮次的变量
+            currentMinIndex = sortedIndex;
+            compareIndex = sortedIndex + 1;
+            step = 'COMPARE';
+            
+            // 更新UI
+            swapContainer.style.display = 'none';
+            compareContainer.style.display = 'block';
+            
+            if (sortOrder === 'asc') {
+                compareQuestion.textContent = `元素 ${numbers[compareIndex]} 是否比当前最小值 ${numbers[currentMinIndex]} 更小?`;
+            } else {
+                compareQuestion.textContent = `元素 ${numbers[compareIndex]} 是否比当前最大值 ${numbers[currentMinIndex]} 更大?`;
+            }
+            
+            renderArray();
+        }
+        
+        /**
+         * 检查排序结果
+         */
+        function checkSortingResult() {
             const isAscending = numbers.every((num, index, arr) => index === 0 || arr[index - 1] <= num);
             const isDescending = numbers.every((num, index, arr) => index === 0 || arr[index - 1] >= num);
+            
             let resultMessage;
-
+            
             if (sortOrder === 'asc' && isAscending) {
-                resultMessage = '恭喜你完成从小到大排序';
+                resultMessage = `恭喜你！成功完成从小到大排序！\n最终得分: ${score}\n正确率: ${Math.round((correctDecisions / totalDecisions) * 100)}%`;
+                debug('从小到大排序成功');
             } else if (sortOrder === 'desc' && isDescending) {
-                resultMessage = '恭喜你完成从大到小排序';
+                resultMessage = `恭喜你！成功完成从大到小排序！\n最终得分: ${score}\n正确率: ${Math.round((correctDecisions / totalDecisions) * 100)}%`;
+                debug('从大到小排序成功');
             } else {
-                resultMessage = '排序失败';
+                resultMessage = `排序结果有误，请重新尝试！\n最终得分: ${score}\n正确率: ${Math.round((correctDecisions / totalDecisions) * 100)}%`;
+                debug('排序失败');
             }
-
+            
             alert(resultMessage);
-            // 重置游戏状态并回到选择模式
             resetGame();
         }
-
-        // 重置游戏状态
+        
+        /**
+         * 重置游戏
+         */
         function resetGame() {
-            currentIndex = 0;
-            selectedCard = null;
-            startButtons.style.display = 'flex';
-            boxes.style.display = 'none';
-            swapButton.style.display = 'none';
-            skipButton.style.display = 'none';
-            restartButton.style.display = 'none';
+            sortedIndex = 0;
+            currentMinIndex = 0;
+            compareIndex = 0;
+            step = 'FIND_MIN';
+            score = 0;
+            totalDecisions = 0;
+            correctDecisions = 0;
+            currentRound = 0;
+            
+            startScreen.style.display = 'block';
+            gameScreen.style.display = 'none';
+            scoreContainer.style.display = 'none';
+            progressBar.style.display = 'none';
+            compareContainer.style.display = 'none';
+            swapContainer.style.display = 'none';
+            
+            updateScore();
         }
-
-        // 重新开始游戏
-        function restartGame() {
-            resetGame();
-        }
-
-        // 开始游戏
+        
+        /**
+         * 开始游戏
+         */
         function startGame(order) {
+            debug(`开始游戏: 排序顺序 ${order}`);
             sortOrder = order;
-            startButtons.style.display = 'none';
-            boxes.style.display = 'block';
-            swapButton.style.display = 'inline-block';
-            skipButton.style.display = 'inline-block';
-            restartButton.style.display = 'inline-block';
-            generateRandomNumbers();
-            renderBoxes();
-            swapButton.disabled = true;
+            
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            scoreContainer.style.display = 'flex';
+            progressBar.style.display = 'block';
+            
+            generateRandomArray();
+            
+            sortedIndex = 0;
+            currentMinIndex = 0;
+            compareIndex = 1;
+            step = 'COMPARE';
+            score = 0;
+            totalDecisions = 0;
+            correctDecisions = 0;
+            currentRound = 0;
+            
+            updateScore();
+            updateProgress();
+            
+            if (sortOrder === 'asc') {
+                compareQuestion.textContent = `元素 ${numbers[compareIndex]} 是否比当前最小值 ${numbers[currentMinIndex]} 更小?`;
+            } else {
+                compareQuestion.textContent = `元素 ${numbers[compareIndex]} 是否比当前最大值 ${numbers[currentMinIndex]} 更大?`;
+            }
+            
+            compareContainer.style.display = 'block';
+            swapContainer.style.display = 'none';
+            
+            renderArray();
+            
+            debug('游戏初始化完成，请按照选择排序算法步骤操作');
         }
-
-        ascButton.addEventListener('click', () => startGame('asc'));
-        descButton.addEventListener('click', () => startGame('desc'));
-        swapButton.addEventListener('click', swapNumbers);
-        skipButton.addEventListener('click', skipBox);
-        restartButton.addEventListener('click', restartGame);
+        
+        // 事件绑定
+        ascButton.addEventListener('click', function() {
+            debug('点击了"从小到大排序"按钮');
+            startGame('asc');
+        });
+        
+        descButton.addEventListener('click', function() {
+            debug('点击了"从大到小排序"按钮');
+            startGame('desc');
+        });
+        
+        yesButton.addEventListener('click', function() {
+            debug('点击了"是"按钮');
+            handleCompareDecision(true);
+        });
+        
+        noButton.addEventListener('click', function() {
+            debug('点击了"否"按钮');
+            handleCompareDecision(false);
+        });
+        
+        swapButton.addEventListener('click', function() {
+            debug('点击了"交换"按钮');
+            handleSwapDecision(true);
+        });
+        
+        skipButton.addEventListener('click', function() {
+            debug('点击了"不交换"按钮');
+            handleSwapDecision(false);
+        });
+        
+        restartButton.addEventListener('click', function() {
+            debug('点击了"重新开始"按钮');
+            resetGame();
+        });
+        
+        debug('初始化完成');
     </script>
 </body>
 
