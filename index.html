@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序算法互动游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        
+        .game-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-card h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .game-card p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .play-button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        
+        .play-button:hover {
+            background-color: #45a049;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>排序算法互动游戏</h1>
+        
+        <div class="game-card">
+            <h2>最值查找</h2>
+            <p>在最值查找游戏中，你需要在数组中找出最大值，这是选择排序算法的核心操作之一。通过这个游戏，你将理解选择排序的基础原理！</p>
+            <a href="最值查找.html" class="play-button">开始游戏</a>
+        </div>
+        
+        <div class="game-card">
+            <h2>选择排序</h2>
+            <p>在选择排序游戏中，你需要从未排序部分选出最小（或最大）元素，与当前位置元素交换。通过互动学习选择排序算法！</p>
+            <a href="选择排序.html" class="play-button">开始游戏</a>
+        </div>
+        
+        <div class="game-card">
+            <h2>冒泡排序</h2>
+            <p>在冒泡排序游戏中，你需要不断交换相邻元素，让较大的元素"冒泡"到数组的后端。体验冒泡排序的过程！</p>
+            <a href="冒泡排序.html" class="play-button">开始游戏</a>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 排序算法互动游戏 | 基于GitHub Pages</p>
+        </div>
+    </div>
+</body>
+</html>
