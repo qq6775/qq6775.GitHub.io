@@ -256,31 +256,56 @@
         function renderBoxes() {
             boxes.innerHTML = '';
             
-            numbers.forEach((num, index) => {
+            for (let i = 0; i < numbers.length; i++) {
+                const num = numbers[i];
+                
                 const cube = document.createElement('div');
                 cube.classList.add('cube');
-                cube.id = `cube-${index}`;
+                cube.id = `cube-${i}`;
 
                 const numberCard = document.createElement('div');
                 numberCard.classList.add('number-card');
                 numberCard.textContent = num;
-                numberCard.id = `card-${index}`;
-                numberCard.setAttribute('data-index', index);
+                numberCard.id = `card-${i}`;
                 
-                // 直接添加事件监听器而不是使用属性
-                numberCard.addEventListener('click', function() {
-                    selectCard(index);
-                });
+                // 使用闭包保存索引值
+                numberCard.onclick = (function(index) {
+                    return function() {
+                        handleCardClick(index);
+                    };
+                })(i);
                 
                 cube.appendChild(numberCard);
 
                 const arrow = document.createElement('div');
                 arrow.classList.add('arrow');
-                arrow.id = `arrow-${index}`;
+                arrow.id = `arrow-${i}`;
                 cube.appendChild(arrow);
 
                 boxes.appendChild(cube);
-            });
+            }
+            
+            updateUI();
+        }
+
+        /**
+         * 处理卡片点击事件
+         */
+        function handleCardClick(index) {
+            console.log(`点击卡片 #${index}, 值=${numbers[index]}`);
+            
+            if (!gameActive) {
+                console.log('游戏未激活，不响应点击');
+                return;
+            }
+            
+            if (index === currentIndex) {
+                console.log('不能选择当前位置的卡片');
+                return;
+            }
+            
+            selectedCard = index;
+            console.log('已选择卡片:', selectedCard);
             
             updateUI();
         }
@@ -289,17 +314,25 @@
          * 更新游戏UI状态
          */
         function updateUI() {
+            console.log('更新UI, 游戏状态:', gameActive, '当前索引:', currentIndex, '选中卡片:', selectedCard);
+            
             // 更新箭头显示
-            document.querySelectorAll('.arrow').forEach((arrow, i) => {
-                arrow.style.display = i === currentIndex ? 'block' : 'none';
-            });
+            for (let i = 0; i < numbers.length; i++) {
+                const arrow = document.getElementById(`arrow-${i}`);
+                if (arrow) {
+                    arrow.style.display = i === currentIndex ? 'block' : 'none';
+                }
+            }
             
             // 重置所有卡片样式
-            document.querySelectorAll('.number-card').forEach(card => {
-                card.style.backgroundColor = '#FFA500';
-            });
+            for (let i = 0; i < numbers.length; i++) {
+                const card = document.getElementById(`card-${i}`);
+                if (card) {
+                    card.style.backgroundColor = '#FFA500';
+                }
+            }
             
-            // 如果有选中的卡片，高亮显示
+            // 高亮选中的卡片
             if (selectedCard !== null) {
                 const card = document.getElementById(`card-${selectedCard}`);
                 if (card) {
@@ -307,13 +340,24 @@
                 }
             }
             
-            // 更新按钮状态
-            swapButton.disabled = (selectedCard === null);
-            
-            // 确保交换按钮在游戏激活状态下可见并根据选择状态启用/禁用
+            // 更新游戏按钮状态
             if (gameActive) {
                 swapButton.style.display = 'inline-block';
-                swapButton.disabled = (selectedCard === null);
+                skipButton.style.display = 'inline-block';
+                restartButton.style.display = 'inline-block';
+                
+                // 只有在选择了卡片的情况下才启用交换按钮
+                if (selectedCard !== null) {
+                    swapButton.disabled = false;
+                    console.log('交换按钮已启用');
+                } else {
+                    swapButton.disabled = true;
+                    console.log('交换按钮已禁用');
+                }
+            } else {
+                swapButton.style.display = 'none';
+                skipButton.style.display = 'none';
+                restartButton.style.display = 'none';
             }
             
             // 更新状态显示
@@ -325,33 +369,20 @@
         }
 
         /**
-         * 选择卡片
-         * @param {number} index - 卡片索引
-         */
-        function selectCard(index) {
-            console.log(`选择卡片 #${index}, 值=${numbers[index]}`);
-            
-            // 如果游戏未激活，不做任何事
-            if (!gameActive) return;
-            
-            // 如果选中的是当前位置，不允许选择
-            if (index === currentIndex) return;
-            
-            // 更新选中的卡片索引
-            selectedCard = index;
-            
-            // 更新UI状态
-            updateUI();
-        }
-
-        /**
          * 执行交换操作
          */
         function swapNumbers() {
+            if (!gameActive || selectedCard === null) {
+                console.log('无法执行交换操作');
+                return;
+            }
+            
             console.log(`交换: 位置 ${currentIndex} (${numbers[currentIndex]}) 和位置 ${selectedCard} (${numbers[selectedCard]})`);
             
             // 交换数组元素
-            [numbers[currentIndex], numbers[selectedCard]] = [numbers[selectedCard], numbers[currentIndex]];
+            const temp = numbers[currentIndex];
+            numbers[currentIndex] = numbers[selectedCard];
+            numbers[selectedCard] = temp;
             
             // 重置选择状态
             selectedCard = null;
@@ -363,10 +394,7 @@
             if (currentIndex >= numbers.length - 1) {
                 checkSorting();
             } else {
-                // 重新渲染UI
                 renderBoxes();
-                // 确保UI状态正确更新
-                updateUI();
             }
         }
 
@@ -376,8 +404,10 @@
         function skipBox() {
             console.log(`跳过位置 ${currentIndex}`);
             
-            // 重置选择并移动到下一个
+            // 重置选择状态
             selectedCard = null;
+            
+            // 移动到下一个索引
             currentIndex++;
             
             // 检查是否需要结束游戏
@@ -451,6 +481,7 @@
             startButtons.style.display = 'none';
             boxes.style.display = 'flex';
             swapButton.style.display = 'inline-block';
+            swapButton.disabled = true; // 初始时禁用交换按钮
             skipButton.style.display = 'inline-block';
             restartButton.style.display = 'inline-block';
             
@@ -458,32 +489,27 @@
             renderBoxes();
         }
 
-        // 绑定按钮事件
-        window.onload = function() {
-            console.log('页面加载完成, 绑定事件');
+        // 初始化事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM完全加载，初始化事件监听器');
             
-            // 绑定开始按钮
-            ascButton.addEventListener('click', function() { 
-                startGame('asc'); 
+            // 绑定开始按钮事件
+            ascButton.addEventListener('click', function() {
+                startGame('asc');
             });
             
-            descButton.addEventListener('click', function() { 
-                startGame('desc'); 
+            descButton.addEventListener('click', function() {
+                startGame('desc');
             });
             
-            // 绑定游戏按钮
+            // 绑定游戏按钮事件
             swapButton.addEventListener('click', swapNumbers);
             skipButton.addEventListener('click', skipBox);
             restartButton.addEventListener('click', resetGame);
             
             // 初始化游戏状态
             resetGame();
-        };
-
-        // 将selectCardById定义为全局函数，以便内联属性能够调用它
-        window.selectCardById = function(index) {
-            selectCard(index);
-        };
+        });
     </script>
 </body>
 
