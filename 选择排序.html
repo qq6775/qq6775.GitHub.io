@@ -267,8 +267,10 @@
                 numberCard.id = `card-${index}`;
                 numberCard.setAttribute('data-index', index);
                 
-                // 直接使用属性设置点击事件，避免事件绑定问题
-                numberCard.setAttribute('onclick', `selectCardById(${index})`);
+                // 直接添加事件监听器而不是使用属性
+                numberCard.addEventListener('click', function() {
+                    selectCard(index);
+                });
                 
                 cube.appendChild(numberCard);
 
@@ -308,6 +310,12 @@
             // 更新按钮状态
             swapButton.disabled = (selectedCard === null);
             
+            // 确保交换按钮在游戏激活状态下可见并根据选择状态启用/禁用
+            if (gameActive) {
+                swapButton.style.display = 'inline-block';
+                swapButton.disabled = (selectedCard === null);
+            }
+            
             // 更新状态显示
             if (gameActive) {
                 statusDisplay.textContent = `当前位置: ${currentIndex + 1}, 排序方式: ${sortOrder === 'asc' ? '从小到大' : '从大到小'}`;
@@ -317,13 +325,17 @@
         }
 
         /**
-         * 通过ID选择卡片
+         * 选择卡片
+         * @param {number} index - 卡片索引
          */
-        function selectCardById(index) {
+        function selectCard(index) {
             console.log(`选择卡片 #${index}, 值=${numbers[index]}`);
             
             // 如果游戏未激活，不做任何事
             if (!gameActive) return;
+            
+            // 如果选中的是当前位置，不允许选择
+            if (index === currentIndex) return;
             
             // 更新选中的卡片索引
             selectedCard = index;
@@ -341,7 +353,7 @@
             // 交换数组元素
             [numbers[currentIndex], numbers[selectedCard]] = [numbers[selectedCard], numbers[currentIndex]];
             
-            // 重新渲染并重置选择状态
+            // 重置选择状态
             selectedCard = null;
             
             // 移动到下一个索引
@@ -351,7 +363,10 @@
             if (currentIndex >= numbers.length - 1) {
                 checkSorting();
             } else {
+                // 重新渲染UI
                 renderBoxes();
+                // 确保UI状态正确更新
+                updateUI();
             }
         }
 
@@ -448,13 +463,26 @@
             console.log('页面加载完成, 绑定事件');
             
             // 绑定开始按钮
-            document.getElementById('ascButton').onclick = function() { startGame('asc'); };
-            document.getElementById('descButton').onclick = function() { startGame('desc'); };
+            ascButton.addEventListener('click', function() { 
+                startGame('asc'); 
+            });
+            
+            descButton.addEventListener('click', function() { 
+                startGame('desc'); 
+            });
             
             // 绑定游戏按钮
-            document.getElementById('swapButton').onclick = swapNumbers;
-            document.getElementById('skipButton').onclick = skipBox;
-            document.getElementById('restartButton').onclick = resetGame;
+            swapButton.addEventListener('click', swapNumbers);
+            skipButton.addEventListener('click', skipBox);
+            restartButton.addEventListener('click', resetGame);
+            
+            // 初始化游戏状态
+            resetGame();
+        };
+
+        // 将selectCardById定义为全局函数，以便内联属性能够调用它
+        window.selectCardById = function(index) {
+            selectCard(index);
         };
     </script>
 </body>
