@@ -165,6 +165,7 @@
     let currentQuestion = 0;
     let score = 0;
     let gameStarted = false;
+    let questionAnswered = false;
 
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -196,6 +197,7 @@
         questionElement.innerHTML = q.question;
         feedbackElement.style.display = 'none';
         nextButton.classList.add('hidden');
+        questionAnswered = false;
         
         options.forEach(option => {
           option.classList.remove('selected', 'correct', 'incorrect');
@@ -206,7 +208,9 @@
     }
 
     function selectOption(e) {
-      if (!gameStarted) return;
+      if (!gameStarted || questionAnswered) return;
+      
+      questionAnswered = true;
       
       const selectedOption = e.target;
       const selectedValue = selectedOption.getAttribute('data-value');
