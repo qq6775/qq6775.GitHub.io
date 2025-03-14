@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>条件判断大挑战</title>
+  <style>
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .game-container {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .question {
+      font-size: 18px;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #f0f8ff;
+      border-left: 4px solid #4682b4;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      padding: 10px;
+      background-color: #e9ecef;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .option:hover {
+      background-color: #d1e7dd;
+    }
+    .selected {
+      background-color: #b8daff;
+    }
+    .correct {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+    .incorrect {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+    .feedback {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+    .next-btn, .start-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .next-btn:hover, .start-btn:hover {
+      background-color: #0069d9;
+    }
+    .score-display {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>条件判断大挑战</h1>
+    <p>测试你对C语言条件表达式的理解！判断以下表达式的结果是TRUE还是FALSE。</p>
+    
+    <div id="start-screen">
+      <button id="start-game" class="start-btn">开始游戏</button>
+    </div>
+    
+    <div id="game-screen" class="hidden">
+      <div id="question" class="question"></div>
+      <div class="options">
+        <div class="option" data-value="true">TRUE</div>
+        <div class="option" data-value="false">FALSE</div>
+      </div>
+      <div id="feedback" class="feedback"></div>
+      <button id="next-question" class="next-btn hidden">下一题</button>
+      <div id="score" class="score-display">得分: 0</div>
+    </div>
+    
+    <div id="end-screen" class="hidden">
+      <h2>游戏结束!</h2>
+      <div id="final-score"></div>
+      <div id="message"></div>
+      <button id="restart-game" class="start-btn">再玩一次</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "int x = 5, y = 10;<br>if (x < y && x > 0)",
+        answer: "true",
+        explanation: "x小于y(5<10)且x大于0(5>0)，两个条件都满足，结果为TRUE"
+      },
+      {
+        question: "int a = 3, b = 3;<br>if (a == b || a > b)",
+        answer: "true",
+        explanation: "a等于b(3=3)，第一个条件满足，结果为TRUE"
+      },
+      {
+        question: "int num = 7;<br>if (num % 2 == 0)",
+        answer: "false",
+        explanation: "num对2取余为1，不等于0，条件不满足，结果为FALSE"
+      },
+      {
+        question: "int x = 10, y = 5;<br>if (x = y)",
+        answer: "true",
+        explanation: "这是赋值操作，不是比较！x被赋值为5，非零值在条件中被视为TRUE"
+      },
+      {
+        question: "int a = 0, b = 5;<br>if (a && b)",
+        answer: "false",
+        explanation: "a为0(假)，b为5(真)，逻辑与操作要求两边都为真，结果为FALSE"
+      },
+      {
+        question: "int x = -1;<br>if (x)",
+        answer: "true",
+        explanation: "x为-1，非零值在条件中被视为TRUE"
+      },
+      {
+        question: "int a = 5, b = 5;<br>if (a != b)",
+        answer: "false",
+        explanation: "a等于b(5=5)，不满足a不等于b的条件，结果为FALSE"
+      },
+      {
+        question: "int x = 10;<br>if (x > 5 && x < 20)",
+        answer: "true",
+        explanation: "x大于5(10>5)且x小于20(10<20)，两个条件都满足，结果为TRUE"
+      },
+      {
+        question: "int a = 0, b = 0;<br>if (a || b)",
+        answer: "false",
+        explanation: "a为0(假)，b为0(假)，逻辑或操作要求至少一边为真，结果为FALSE"
+      },
+      {
+        question: "int x = 100;<br>if (!(x < 50))",
+        answer: "true",
+        explanation: "x<50为假，取反后为真，结果为TRUE"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let gameStarted = false;
+
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const endScreen = document.getElementById('end-screen');
+    const questionElement = document.getElementById('question');
+    const options = document.querySelectorAll('.option');
+    const feedbackElement = document.getElementById('feedback');
+    const nextButton = document.getElementById('next-question');
+    const scoreElement = document.getElementById('score');
+    const finalScoreElement = document.getElementById('final-score');
+    const messageElement = document.getElementById('message');
+    const startButton = document.getElementById('start-game');
+    const restartButton = document.getElementById('restart-game');
+
+    function startGame() {
+      startScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      endScreen.classList.add('hidden');
+      currentQuestion = 0;
+      score = 0;
+      scoreElement.textContent = `得分: ${score}`;
+      loadQuestion();
+      gameStarted = true;
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < questions.length) {
+        const q = questions[currentQuestion];
+        questionElement.innerHTML = q.question;
+        feedbackElement.style.display = 'none';
+        nextButton.classList.add('hidden');
+        
+        options.forEach(option => {
+          option.classList.remove('selected', 'correct', 'incorrect');
+        });
+      } else {
+        endGame();
+      }
+    }
+
+    function selectOption(e) {
+      if (!gameStarted) return;
+      
+      const selectedOption = e.target;
+      const selectedValue = selectedOption.getAttribute('data-value');
+      const correctAnswer = questions[currentQuestion].answer;
+      
+      options.forEach(option => {
+        option.classList.remove('selected');
+      });
+      
+      selectedOption.classList.add('selected');
+      
+      if (selectedValue === correctAnswer) {
+        selectedOption.classList.add('correct');
+        feedbackElement.innerHTML = `<p>正确！${questions[currentQuestion].explanation}</p>`;
+        feedbackElement.style.backgroundColor = '#d4edda';
+        score++;
+        scoreElement.textContent = `得分: ${score}`;
+      } else {
+        selectedOption.classList.add('incorrect');
+        const correctOption = document.querySelector(`.option[data-value="${correctAnswer}"]`);
+        correctOption.classList.add('correct');
+        feedbackElement.innerHTML = `<p>错误！${questions[currentQuestion].explanation}</p>`;
+        feedbackElement.style.backgroundColor = '#f8d7da';
+      }
+      
+      feedbackElement.style.display = 'block';
+      nextButton.classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      loadQuestion();
+    }
+
+    function endGame() {
+      gameScreen.classList.add('hidden');
+      endScreen.classList.remove('hidden');
+      finalScoreElement.textContent = `你的最终得分: ${score} / ${questions.length}`;
+      
+      let message = '';
+      const percentage = (score / questions.length) * 100;
+      
+      if (percentage >= 90) {
+        message = '太棒了！你对C语言条件表达式有很深的理解！';
+      } else if (percentage >= 70) {
+        message = '很好！你掌握了大部分条件表达式的用法。';
+      } else if (percentage >= 50) {
+        message = '不错的尝试！再多练习一下条件表达式。';
+      } else {
+        message = '需要更多练习！重新复习一下条件表达式的规则。';
+      }
+      
+      messageElement.textContent = message;
+      gameStarted = false;
+    }
+
+    options.forEach(option => {
+      option.addEventListener('click', selectOption);
+    });
+
+    nextButton.addEventListener('click', nextQuestion);
+    startButton.addEventListener('click', startGame);
+    restartButton.addEventListener('click', startGame);
+  </script>
+</body>
+</html>
